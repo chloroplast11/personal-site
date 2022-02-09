@@ -1,0 +1,40 @@
+.article{
+  color: #222;
+  margin-bottom: 32px;
+  .titleHead{
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 26px;
+    time{
+      margin-right: 13px;
+    }
+    .tag{
+      color: #f7a046;
+    }
+  }
+  
+  .title{
+    margin: 0 0 14px 0;
+    font-size: 26px;
+    .titleLink{
+      color: #222;
+      line-height: 32px;
+      &:hover{
+        border-bottom: 1px solid #222;
+      }
+    }
+  }
+  
+  .description{
+    margin-bottom: 20px;
+    line-height: 24px;
+  }
+  
+  .readMore{
+    color: #5d93ff;
+    &:hover{
+      border-bottom: 1px solid #5d93ff;
+    }
+  }
+}
+

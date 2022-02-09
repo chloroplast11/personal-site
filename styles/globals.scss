@@ -1,0 +1,132 @@
+@import './iconfont.css';
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+body{
+  margin: 0;
+  color: #222;
+  font-size: 16px;
+  line-height: 1.625;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*{
+  box-sizing: border-box;
+}
+
+
+h1, h2, h3, h4, h5, h6{
+  font-weight: 600;
+}
+ul,li{ padding:0;margin:0;list-style:none}
+
+
+/*所有(包含以下四种样式)*/
+a{
+  text-decoration:none;/*去掉a标签下划线*/
+}
+
+/*未被访问的链接*/
+a:link{
+  text-decoration:none;
+}
+
+/*访问过的*/
+a:visited{
+  text-decoration:none;
+}
+
+/*鼠标划过（停留）*/
+a:hover{
+  text-decoration:none;
+}
+
+/*正在点击*/
+a:active{
+  text-decoration:none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img{
+  max-width: 100%;
+}
+
+.index-wrapper{
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 30px 20px;
+  nav{
+    width: 300px;
+    padding: 0 20px 20px 20px;
+    float: left;
+    position: relative;
+  }
+  nav::after{
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    bottom: 0;
+    background: linear-gradient(180deg,#e6e6e6 0,#e6e6e6 48%,#fff);
+  }
+  main{
+    width: calc(100% - 300px);
+    display: inline-block;
+    padding: 10px 20px 10px 30px;
+  }
+}
+
+nav{
+  img{
+    width: 75px;
+    border-radius: 50%;
+  }
+  h5{
+    color: #222;
+    font-weight: 600;
+    font-size: 18px;
+    margin: 15px 0;
+  }
+  p{
+    color: #888;
+    line-height: 24px;
+    margin-bottom: 25px;
+  }
+  li {
+    line-height: 26px;
+    margin: 10px 0;
+  }
+  a{
+    color: #222;
+    &:hover{
+      border-bottom: 1px solid #222;
+    }
+  }
+}
+
+.tag-link{
+  padding: 10px 25px;
+  border: 1px solid #e6e6e6;
+  font-size: 16px;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: 20px;
+  &:hover{
+    color: #5d93ff;
+  }
+}

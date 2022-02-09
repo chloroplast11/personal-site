@@ -1,0 +1,85 @@
+
+#article{
+  padding: 50px 150px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  .article-content{
+    h1.title{
+      text-align: center;
+      font-size: 40px;
+      max-width: 80%;
+      margin: 0 auto;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+  }
+
+  aside{
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    text-align: center;
+    ul{
+      margin-top: 30px;
+      li{
+        height: 40px;
+        width: 40px;
+        line-height: 38px;
+        border: 1px solid #e6e6e6;
+        border-radius: 50%;
+        overflow: hidden;
+        margin: 10px auto;
+        cursor: pointer;
+        &:hover{
+          color: #5d93ff;
+        }
+        &.active{
+          color: #5d93ff;
+        }
+      }
+    }
+  }
+}
+
+.editor-wrapper{
+  padding: 0 20px;
+  background-color: #f6f6f6;
+  min-height: 20em;
+  overflow: hidden;
+  color: #121212;
+  .title-editor{
+    padding: 16px 0;
+    margin-bottom: 30px;
+    width: 100%;
+    border: none;
+    color: #121212;
+    background-color: #f6f6f6;
+    display: block;
+    width: 100%;
+    border: 0;
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: 600;
+    font-synthesis: style;
+    border-bottom: 1px solid rgba(18,18,18,.08);
+    resize : none;
+    &:focus{
+      outline: none;
+    }
+  }
+}
+
+.public-DraftStyleDefault-pre{
+  padding: 1em;
+  background-color: #fdf6e3;
+  border-radius: 0.3em;
+  overflow: auto;
+  .cyhCodeBlock{
+    margin: 0;
+  }
+}
+
+.Editable-styled, .Editable-unstyled {
+  margin: 0 0 1.4em;
+}
