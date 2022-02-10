@@ -12,6 +12,10 @@ export default function Article() {
     EditorState.createEmpty() 
   );
 
+  const [title, setTitle] = useState('');
+  const [name, setName] = useState('');
+  const [abstract, setAbstract] = useState('');
+
   const [inlineTypes, setInlineTypes] = useState(InlineTypes.map(item => ({...item, active: false})));
   const [blockTypes, setBlockTypes] = useState(BlockTypes.map(item => ({...item, active: false})));
 
@@ -40,8 +44,22 @@ export default function Article() {
     return false;
   }
 
+  // 保存文章
   function save(){
-    console.log(convertToRaw(editorState.getCurrentContent()));
+    const content = convertToRaw(editorState.getCurrentContent());
+    console.log(content);
+    const res = fetch('http://localhost:3000/api/articles',{
+      method: 'POST',
+      body: JSON.stringify({
+        name: name,
+        title: title,
+        abstract: abstract,
+        content: JSON.stringify(content)
+      }),
+      headers:{
+        'Content-Type':'application/json;charset=UTF-8'
+      },
+    })
   }
 
   function keyBindingFn(event){
@@ -98,7 +116,13 @@ export default function Article() {
       </aside>
       <article className='article-content'>
         <div className='editor-wrapper'>
-          <textarea className='title-editor' rows={1} placeholder='请在此输入标题'></textarea>
+          <textarea 
+            className='title-editor' 
+            rows={1} 
+            placeholder='请在此输入标题' 
+            value={title} 
+            onChange={(e) => setTitle(e.target.value)}>
+          </textarea>
           <div onClick={focusEditor}>
             <NoSsr>
               <Editor
@@ -112,6 +136,20 @@ export default function Article() {
               />
             </NoSsr>
           </div>
+          <textarea 
+            className='title-editor' 
+            rows={1} 
+            placeholder='请在此输入名称' 
+            value={name} 
+            onChange={(e) => setName(e.target.value)}>
+          </textarea>
+          <textarea 
+            className='title-editor' 
+            rows={1} 
+            placeholder='请在此输入摘要' 
+            value={abstract} 
+            onChange={(e) => setAbstract(e.target.value)}>
+          </textarea>
         </div>
         <button onClick={save}>save</button>
       </article>

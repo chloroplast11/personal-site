@@ -6,15 +6,16 @@
     font-weight: 600;
     line-height: 26px;
     time{
-      margin-right: 13px;
+      margin-right: 10px;
     }
     .tag{
       color: #f7a046;
+      margin: 0 10px;
     }
   }
   
   .title{
-    margin: 0 0 14px 0;
+    margin: 0 0 4px 0;
     font-size: 26px;
     .titleLink{
       color: #222;
@@ -27,6 +28,7 @@
   
   .description{
     margin-bottom: 20px;
+    margin-top: 0;
     line-height: 24px;
   }
   
