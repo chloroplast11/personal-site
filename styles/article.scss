@@ -5,7 +5,7 @@
   margin: 0 auto;
   position: relative;
   .article-content{
-    h1.title{
+    >h1.title{
       text-align: center;
       font-size: 40px;
       max-width: 80%;
@@ -48,25 +48,35 @@
   min-height: 20em;
   overflow: hidden;
   color: #121212;
-  .title-editor{
-    padding: 16px 0;
-    margin-bottom: 30px;
+  textarea, input{
     width: 100%;
-    border: none;
     color: #121212;
     background-color: #f6f6f6;
+    border: none;
+    font-synthesis: style;
+    border-bottom: 1px solid rgba(18,18,18,.08);
     display: block;
     width: 100%;
     border: 0;
-    font-size: 32px;
-    line-height: 1.4;
-    font-weight: 600;
-    font-synthesis: style;
-    border-bottom: 1px solid rgba(18,18,18,.08);
     resize : none;
     &:focus{
       outline: none;
     }
+  }
+  .bottom{
+    border-top: 1px solid rgba(18,18,18,.8);
+    padding-top: 15px;
+    margin-top: 15px;
+    input{
+      margin-bottom: 10px;
+    }
+  }
+  .title-editor{
+    padding: 16px 0;
+    margin-bottom: 30px;
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: 600;
   }
 }
 
