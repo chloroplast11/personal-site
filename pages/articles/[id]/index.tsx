@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement } from 'react';
 import { Editor, EditorState, convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { Article } from '../../../model/article';
 import MediaComponent from '../../../components/media';
+import { createLinkDecorator } from '../../../components/link';
 
 
 export default function ArticleDetails({article}: {article: Article}) {
@@ -12,10 +13,10 @@ export default function ArticleDetails({article}: {article: Article}) {
   if(article.content){
     contentState = convertFromRaw(JSON.parse(article.content));
   }
+
+  const decorator = createLinkDecorator();
   
-  const [editorState, setEditorState] = useState(() => 
-    contentState ? EditorState.createWithContent(contentState) : EditorState.createEmpty() 
-  );
+  const editorState = contentState ? EditorState.createWithContent(contentState, decorator) : EditorState.createEmpty();
 
   function myBlockRenderer(contentBlock){
     const type = contentBlock.getType();

@@ -1,21 +1,23 @@
 import Link from 'next/link';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { BlockTypes, InlineTypes, otherTypes } from '../../../model/editor';
-import { Editor, EditorState, RichUtils, getDefaultKeyBinding, convertToRaw, convertFromRaw, AtomicBlockUtils } from "draft-js";
+import { Editor, EditorState, RichUtils, getDefaultKeyBinding, convertToRaw, convertFromRaw, AtomicBlockUtils, Entity } from "draft-js";
 import NoSsr from '../../../components/nossr';
 import "draft-js/dist/Draft.css";
 import { Article } from '../../../model/article';
-import MediaComponent from '../../../components/media';
+import MediaComponent, { onAddImg } from '../../../components/media';
+import { createLinkDecorator, onAddLink } from '../../../components/link';
 
 const Edit = ({article}: {article: Article}) => {
 
+  // initiate editorState
   let contentState;
   if(article.content){
     contentState = convertFromRaw(JSON.parse(article.content));
   }
-
+  const decorator = createLinkDecorator();
   const [editorState, setEditorState] = useState(() => 
-    contentState ? EditorState.createWithContent(contentState) : EditorState.createEmpty() 
+    contentState ? EditorState.createWithContent(contentState, decorator) : EditorState.createEmpty() 
   );
 
   const [title, setTitle] = useState(article.title);
@@ -39,32 +41,13 @@ const Edit = ({article}: {article: Article}) => {
     setEditorState(state);
   }
 
-  // 插入图片或链接
+  // insert image or link
   const triggerOtherType = (item) => {
     if(item.key == 'img'){
-      const contentState = editorState.getCurrentContent();
-      let src="https://cdn.wwads.cn/creatives/CpiLPQKm8xTHSCGvyMOQQ6lrIc6Oti2WricDsnJ0.png";
-      // 使用 `contentState.createEntity` 创建一个 `entity`，指定其 `type` 为 `image`
-      const contentStateWithEntity = contentState.createEntity(
-        'image',
-        'IMMUTABLE',
-        { src }
-      );
-
-      console.log(contentStateWithEntity.getEntityMap());
-
-      // 获取新创建的 `entity` 的 key
-      const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-
-
-      // 用 `EditorState.set()`  来建立一个带有这个 `entity` 的新的 EditorState 
-      const newEditorState = EditorState.set(
-        editorState,
-        { currentContent: contentStateWithEntity });
-
-      // 利用`AtomicBlockUtils.insertAtomicBlock` 来插入一个新的 `block`
-      setEditorState(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
-      
+      // onAddImg(editorState, setEditorState);
+      // createModal();
+    }else if(item.key == 'link'){
+      onAddLink(editorState, setEditorState);
     }
   }
 
@@ -79,7 +62,7 @@ const Edit = ({article}: {article: Article}) => {
     return false;
   }
 
-  // 保存文章
+  // save article
   function save(){
     const content = convertToRaw(editorState.getCurrentContent());
     const data = {

@@ -80,6 +80,7 @@
   }
 }
 
+//编辑器内部样式
 .public-DraftStyleDefault-pre{
   padding: 1em;
   background-color: #fdf6e3;
@@ -88,6 +89,10 @@
   .cyhCodeBlock{
     margin: 0;
   }
+}
+
+figure{
+  text-align: center;
 }
 
 .Editable-styled, .Editable-unstyled {
