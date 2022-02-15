@@ -11,7 +11,7 @@ const ArticleHandler: NextApiHandler = (req, res) => {
   }else if(method == 'GET'){
     get(res, id);
   }else{
-    res.status(500).json({ message: 'cannot reponse to this method' })
+    res.status(500).json({ message: 'cannot reponse to this http method' })
   }
   
 }

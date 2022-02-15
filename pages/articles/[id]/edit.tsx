@@ -5,8 +5,9 @@ import { Editor, EditorState, RichUtils, getDefaultKeyBinding, convertToRaw, con
 import NoSsr from '../../../components/nossr';
 import "draft-js/dist/Draft.css";
 import { Article } from '../../../model/article';
-import MediaComponent, { onAddImg } from '../../../components/media';
+import MediaComponent from '../../../components/media';
 import { createLinkDecorator, onAddLink } from '../../../components/link';
+import Modal from '../../../components/modal';
 
 const Edit = ({article}: {article: Article}) => {
 
@@ -23,6 +24,7 @@ const Edit = ({article}: {article: Article}) => {
   const [title, setTitle] = useState(article.title);
   const [name, setName] = useState(article.name);
   const [abstract, setAbstract] = useState(article.abstract);
+  const [uploadImgModalVisible, setUploadImgModalVisible] = useState(false);
 
   const [inlineTypes, setInlineTypes] = useState(InlineTypes.map(item => ({...item, active: false})));
   const [blockTypes, setBlockTypes] = useState(BlockTypes.map(item => ({...item, active: false})));
@@ -45,7 +47,7 @@ const Edit = ({article}: {article: Article}) => {
   const triggerOtherType = (item) => {
     if(item.key == 'img'){
       // onAddImg(editorState, setEditorState);
-      // createModal();
+      setUploadImgModalVisible(true);
     }else if(item.key == 'link'){
       onAddLink(editorState, setEditorState);
     }
@@ -133,8 +135,27 @@ const Edit = ({article}: {article: Article}) => {
     }
   }
 
+  function saveImg(){
+    const file = (document.getElementById('file-input') as any).files[0];
+    if(file){
+      const form = new FormData();
+      form.append('file', file);
+      fetch('http://localhost:3000/api/articles/img', {method: 'POST', body: form}).then(r => {
+        console.log(r);
+      })
+    }
+  }
+
   return (
     <main id='article'>
+      {uploadImgModalVisible && ( 
+        <Modal setVisibleState={setUploadImgModalVisible} onSave={saveImg}>
+          <input 
+            type='file' 
+            accept="image/png, image/jpeg"
+            id='file-input'></input>
+        </Modal>
+      )}
       <aside>
         <Link href='/articles'>
           <a className='tag-link'>All Articles</a>
