@@ -5,18 +5,32 @@ const MediaComponent = ({contentState, block}) => {
   const entity = contentState.getEntity(block.getEntityAt(0));
   const { src } = entity.getData();    // 取出图片的地址
   const type = entity.getType();  // 判断 entity 的 type 的
+  const { width, height } = getQueryVariable(src);
   return (
     <>
-      <Image src={src} width={300} height={300}></Image>
+      <Image src={src} width={width} height={height}></Image>
     </>
   )
 }
 
+function getQueryVariable(url){
+  let obj = {
+    width: 300,
+    height: 300
+  };
+  let parastr = url.split("?")[1];
+  if(!parastr){return obj}
+  var arr = parastr.split("&");
+  for (var i = 0; i < arr.length; i++) {
+    obj[arr[i].split("=")[0]] = arr[i].split("=")[1];
+  }
+  return obj;
+}
+
 export default MediaComponent;
 
-export const onAddImg = (editorState, setEditorState) => {
+export const onAddImg = (editorState, setEditorState, src) => {
   const contentState = editorState.getCurrentContent();
-  let src="https://cdn.wwads.cn/creatives/CpiLPQKm8xTHSCGvyMOQQ6lrIc6Oti2WricDsnJ0.png";
   // 使用 `contentState.createEntity` 创建一个 `entity`，指定其 `type` 为 `image`
   const contentStateWithEntity = contentState.createEntity(
     'image',

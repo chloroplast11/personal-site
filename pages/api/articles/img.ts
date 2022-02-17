@@ -1,6 +1,7 @@
 import { NextApiHandler } from "next";
 import { IncomingForm } from 'formidable'
 const fs = require('fs');
+const sizeOf = require('image-size');
 
 export const config = {
   api: {
@@ -11,6 +12,7 @@ export const config = {
 
 export const ArticleImageHandler: NextApiHandler = async (req, res) => {
   const { method } = req;
+  // res.status(200).json({message: __dirname});
   if(method == 'POST'){
     const data = (await new Promise((resolve, reject) => {
       const form = new IncomingForm();
@@ -34,9 +36,11 @@ export const ArticleImageHandler: NextApiHandler = async (req, res) => {
         }
         //拼接成图片名
         const keepname = time + '.' + ext;
-        fs.writeFile(__dirname + '/../../../images/articles/' + keepname, data, (err) => {
+        const filePath = '/Applications/XAMPP/xamppfiles/htdocs/images/' + keepname;
+        fs.writeFile(filePath, data, (err) => {
+          const dimensions = sizeOf(filePath);
           if (err) { res.status(500).json({message: 'Fail to upload', err: err}); return; }
-          res.status(200).json({ message: 'success', data: '/public/articles/' + keepname })
+          res.status(200).json({ message: 'success', data: `http://localhost/images/${keepname}?width=${dimensions.width}&height=${dimensions.height}` })
         });
       });
     }else{

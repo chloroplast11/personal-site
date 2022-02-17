@@ -5,7 +5,7 @@ import { Editor, EditorState, RichUtils, getDefaultKeyBinding, convertToRaw, con
 import NoSsr from '../../../components/nossr';
 import "draft-js/dist/Draft.css";
 import { Article } from '../../../model/article';
-import MediaComponent from '../../../components/media';
+import MediaComponent, { onAddImg } from '../../../components/media';
 import { createLinkDecorator, onAddLink } from '../../../components/link';
 import Modal from '../../../components/modal';
 
@@ -46,7 +46,6 @@ const Edit = ({article}: {article: Article}) => {
   // insert image or link
   const triggerOtherType = (item) => {
     if(item.key == 'img'){
-      // onAddImg(editorState, setEditorState);
       setUploadImgModalVisible(true);
     }else if(item.key == 'link'){
       onAddLink(editorState, setEditorState);
@@ -135,13 +134,17 @@ const Edit = ({article}: {article: Article}) => {
     }
   }
 
-  function saveImg(){
+  const saveImg = () => {
     const file = (document.getElementById('file-input') as any).files[0];
     if(file){
       const form = new FormData();
       form.append('file', file);
-      fetch('http://localhost:3000/api/articles/img', {method: 'POST', body: form}).then(r => {
-        console.log(r);
+      fetch('http://localhost:3000/api/articles/img', {method: 'POST', body: form}).then(r => r.json()).then(r => {
+        if(r.data){
+          setUploadImgModalVisible(false);
+          console.log(r.data);
+          onAddImg(editorState, setEditorState, r.data);
+        }
       })
     }
   }
