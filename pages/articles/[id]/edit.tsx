@@ -66,6 +66,10 @@ const Edit = ({article}: {article: Article}) => {
   // save article
   function save(){
     const content = convertToRaw(editorState.getCurrentContent());
+    console.log(content);
+    content.blocks.map(item => {
+      item.text ? item.text = item.text.replace(/\n/g, '\\n') : '';
+    })
     const data = {
       name: name,
       title: title,

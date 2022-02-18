@@ -13,6 +13,22 @@
       font-weight: 600;
       margin-bottom: 20px;
     }
+    pre>code{
+      padding: 1em;
+      background-color: #fdf6e3;
+      border-radius: 0.3em;
+      overflow: auto;
+      display: block;
+    }
+    ul{
+      margin-block-start: 1em;
+      margin-block-end: 1em;
+      margin-inline-start: 0px;
+      margin-inline-end: 0px;
+      padding-inline-start: 40px;
+    }
+    ul li{ list-style: auto; }
+    ol li{ list-style: disc; }
   }
 
   aside{

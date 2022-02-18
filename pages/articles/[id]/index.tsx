@@ -1,31 +1,36 @@
 import Link from 'next/link';
 import React, { ReactElement } from 'react';
-import { Editor, EditorState, convertFromRaw } from "draft-js";
+import { convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { Article } from '../../../model/article';
-import MediaComponent from '../../../components/media';
-import { createLinkDecorator } from '../../../components/link';
-
+import { stateToHTML } from 'draft-js-export-html';
 
 export default function ArticleDetails({article}: {article: Article}) {
 
-  let contentState;
-  if(article.content){
-    contentState = convertFromRaw(JSON.parse(article.content));
-  }
-
-  const decorator = createLinkDecorator();
+  let html;
+  const options = {
+    entityStyleFn: (entity) => {
+      const entityType = entity.get('type').toLowerCase();
+      if (entityType === 'link') {
+        const data = entity.getData();
+        return {
+          element: 'a',
+          attributes: {
+            href: data.url,
+            target: '_blank'
+          },
+          style: {
+            color: '#5d93ff',
+            textDecoration: 'underline'
+          },
+        };
+      }
+    },
+  };
   
-  const editorState = contentState ? EditorState.createWithContent(contentState, decorator) : EditorState.createEmpty();
-
-  function myBlockRenderer(contentBlock){
-    const type = contentBlock.getType();
-    if(type === 'atomic'){
-      return {
-        component: MediaComponent,
-        editable: false
-      };
-    }
+  if(article.content){
+    const contentState = convertFromRaw(JSON.parse(article.content));
+    html = stateToHTML(contentState, options);
   }
 
   return (
@@ -37,13 +42,11 @@ export default function ArticleDetails({article}: {article: Article}) {
       </aside>
       <article className='article-content'>
         <h1 className='title'>{article.title}</h1>
-        <div>
-          <Editor
-            editorState={editorState}
-            readOnly={true}
-            blockRendererFn={myBlockRenderer}
-          />
+        <div className='abstract'>
+          <h2>摘要</h2>
+          <p>{article.abstract}</p>
         </div>
+        <div dangerouslySetInnerHTML={{__html:html}}></div>
       </article>
     </main>
     
