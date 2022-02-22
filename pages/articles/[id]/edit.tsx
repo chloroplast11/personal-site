@@ -8,6 +8,7 @@ import { Article } from '../../../model/article';
 import MediaComponent, { onAddImg } from '../../../components/media';
 import { createLinkDecorator, onAddLink } from '../../../components/link';
 import Modal from '../../../components/modal';
+import { GetStaticProps } from 'next'
 
 const Edit = ({article}: {article: Article}) => {
 
@@ -63,9 +64,59 @@ const Edit = ({article}: {article: Article}) => {
     return false;
   }
 
+  function keyBindingFn(event){
+    const code = event.code;
+    console.log(event);
+    if(code === 'Enter' || code === 'Backspace' || code.indexOf('Arrow') !== -1){
+      checkTypesStatus();
+    }else if(code === 'Tab'){
+    //   console.log("asdasd");
+    //   const newEditorState = RichUtils.onTab(event, editorState, 2);
+    //   if (newEditorState !== editorState) {
+    //     setEditorState(newEditorState);
+    //     return;
+    //  }
+    }
+    return getDefaultKeyBinding(event);
+  }
+
+  function checkTypesStatus(){
+    const blockType = RichUtils.getCurrentBlockType(editorState);
+    setBlockTypes(BlockTypes.map(item => ({...item, active: blockType == item.key})));
+    const inlineKeys = [...editorState.getCurrentInlineStyle()];
+    setInlineTypes(inlineTypes.map(item => ({...item, active: inlineKeys.includes(item.key)})));
+  }
+
+  function myBlockStyleFn(contentBlock) {
+    const type = contentBlock.getType();
+    if(type === 'unstyled'){
+      return 'Editable-unstyled';
+    }
+  }
+
+  function myBlockRenderer(contentBlock){
+    const type = contentBlock.getType();
+    if(type === 'atomic'){
+      return {
+        component: MediaComponent,
+        editable: false
+      };
+    }
+  }
+
+  function handleKeyCommand(command: string): string{
+    if(command == 'split-block' && RichUtils.getCurrentBlockType(editorState) == 'code-block'){
+      const newEditorState = RichUtils.insertSoftNewline(editorState);
+      setEditorState(newEditorState);
+      return 'handled'
+    }
+  }
+
   // save article
-  function save(){
+  const save = () => {
     const content = convertToRaw(editorState.getCurrentContent());
+    
+    // delete content.entityMap['0'];
     console.log(content);
     content.blocks.map(item => {
       item.text ? item.text = item.text.replace(/\n/g, '\\n') : '';
@@ -94,48 +145,6 @@ const Edit = ({article}: {article: Article}) => {
       }
     })
     
-  }
-
-  function keyBindingFn(event){
-    const code = event.code;
-    if(code === 'Enter' || code === 'Backspace' || code.indexOf('Arrow') !== -1){
-      checkTypesStatus();
-    }
-    return getDefaultKeyBinding(event);
-  }
-
-  function checkTypesStatus(){
-    const blockType = RichUtils.getCurrentBlockType(editorState);
-    setBlockTypes(BlockTypes.map(item => ({...item, active: blockType == item.key})));
-    const inlineKeys = [...editorState.getCurrentInlineStyle()];
-    setInlineTypes(inlineTypes.map(item => ({...item, active: inlineKeys.includes(item.key)})));
-  }
-
-  function myBlockStyleFn(contentBlock) {
-    const type = contentBlock.getType();
-    if (type === 'code-block') {
-      return 'cyhCodeBlock';
-    }else if(type === 'unstyled'){
-      return 'Editable-unstyled';
-    }
-  }
-
-  function myBlockRenderer(contentBlock){
-    const type = contentBlock.getType();
-    if(type === 'atomic'){
-      return {
-        component: MediaComponent,
-        editable: false
-      };
-    }
-  }
-
-  function handleKeyCommand(command: string): string{
-    if(command == 'split-block' && RichUtils.getCurrentBlockType(editorState) == 'code-block'){
-      const newEditorState = RichUtils.insertSoftNewline(editorState);
-      setEditorState(newEditorState);
-      return 'handled'
-    }
   }
 
   const saveImg = () => {
@@ -253,7 +262,7 @@ export async function getStaticPaths() {
   }
 }
 
-export async function getStaticProps({params}) {
+export const getStaticProps: GetStaticProps = async ({params}) => {
   let data: Article;
   const res = await fetch(`http://localhost:3000/api/articles/${params.id}`, {method: 'GET'});
   

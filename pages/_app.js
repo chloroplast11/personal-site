@@ -1,5 +1,6 @@
 import '../styles/globals.scss';
 import '../styles/article.scss';
+import '../styles/highlight.css';
 import Layout from '../components/layout';
 
 function MyApp({ Component, pageProps }) {

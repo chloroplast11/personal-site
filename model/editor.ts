@@ -15,6 +15,7 @@ export const BlockTypes = [
   { label: '代码', key: 'code-block', icon: 'icon-daimakuai' },
 ]
 
+// 其他类型
 export const otherTypes = [
   { label: '链接', key: 'link', icon: 'icon-lianjie' },
   { label: '图片', key: 'img', icon: 'icon-tupian' }

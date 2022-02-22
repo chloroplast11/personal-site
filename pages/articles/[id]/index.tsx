@@ -4,8 +4,12 @@ import { convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { Article } from '../../../model/article';
 import { stateToHTML } from 'draft-js-export-html';
+import Head from 'next/head';
+const hljs = require('highlight.js');
 
 export default function ArticleDetails({article}: {article: Article}) {
+
+  console.log(article);
 
   let html;
   const options = {
@@ -26,6 +30,12 @@ export default function ArticleDetails({article}: {article: Article}) {
         };
       }
     },
+    blockRenderers: {
+      'code-block': (block) => {
+        const code = hljs.highlight(block.getText(), {language: 'javascript'}).value;
+        return `<pre><code>${code}</code></pre>`;
+      },
+    },
   };
   
   if(article.content){
@@ -34,21 +44,27 @@ export default function ArticleDetails({article}: {article: Article}) {
   }
 
   return (
-    <main id='article'>
-      <aside>
-        <Link href='/articles'>
-          <a className='tag-link'>All Articles</a>
-        </Link>
-      </aside>
-      <article className='article-content'>
-        <h1 className='title'>{article.title}</h1>
-        <div className='abstract'>
-          <h2>摘要</h2>
-          <p>{article.abstract}</p>
-        </div>
-        <div dangerouslySetInnerHTML={{__html:html}}></div>
-      </article>
-    </main>
+    <>
+      <Head>
+        <title>{article.name}</title>
+        <meta name='description' content={article.abstract}></meta>
+      </Head>
+      <main id='article'>
+        <aside>
+          <Link href='/articles'>
+            <a className='tag-link'>All Articles</a>
+          </Link>
+        </aside>
+        <article className='article-content'>
+          <h1 className='title'>{article.title}</h1>
+          <div className='abstract'>
+            <h2>摘要</h2>
+            <p>{article.abstract}</p>
+          </div>
+          <div dangerouslySetInnerHTML={{__html:html}}></div>
+        </article>
+      </main>
+    </>
     
   );
 }
@@ -80,6 +96,10 @@ export async function getStaticProps({params}) {
   
   if(res.status == 200){
     data = await res.json();
+  }else{
+    return {
+      notFound: true
+    }
   }
   return {
     props: {
