@@ -1,126 +1,33 @@
 import Link from 'next/link';
-import React, { ReactElement, useEffect, useState } from 'react';
-import { BlockTypes, InlineTypes, otherTypes } from '../../../model/editor';
-import { Editor, EditorState, RichUtils, getDefaultKeyBinding, convertToRaw, convertFromRaw, AtomicBlockUtils, Entity } from "draft-js";
-import NoSsr from '../../../components/nossr';
+import React, { ReactElement, useState } from 'react';
+import { convertFromRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { Article } from '../../../model/article';
-import MediaComponent, { onAddImg } from '../../../components/media';
-import { createLinkDecorator, onAddLink } from '../../../components/link';
 import Modal from '../../../components/modal';
 import { GetStaticProps } from 'next'
+import NoSsr from '../../../components/nossr';
+import RichEditor from '../../../components/rich-editor/editor';
 
 const Edit = ({article}: {article: Article}) => {
 
-  // initiate editorState
   let contentState;
   if(article.content){
     contentState = convertFromRaw(JSON.parse(article.content));
   }
-  const decorator = createLinkDecorator();
-  const [editorState, setEditorState] = useState(() => 
-    contentState ? EditorState.createWithContent(contentState, decorator) : EditorState.createEmpty() 
-  );
+
+  const richRditor = React.useRef(null);
 
   const [title, setTitle] = useState(article.title);
   const [name, setName] = useState(article.name);
   const [abstract, setAbstract] = useState(article.abstract);
   const [uploadImgModalVisible, setUploadImgModalVisible] = useState(false);
+  const [addLinkModalVisible, setAddLinkModalVisible] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkText, setLinkText] = useState('');
 
-  const [inlineTypes, setInlineTypes] = useState(InlineTypes.map(item => ({...item, active: false})));
-  const [blockTypes, setBlockTypes] = useState(BlockTypes.map(item => ({...item, active: false})));
-
-  const toggleInlineStyle = (item) => {
-    item.active = !item.active;
-    setInlineTypes(inlineTypes);
-    let state = RichUtils.toggleInlineStyle(editorState, item.key);
-    setEditorState(state);
-  }
-
-  const toggleBlockType = (item) => {
-    item.active = !item.active;
-    setBlockTypes(blockTypes);
-    let state = RichUtils.toggleBlockType(editorState, item.key);
-    setEditorState(state);
-  }
-
-  // insert image or link
-  const triggerOtherType = (item) => {
-    if(item.key == 'img'){
-      setUploadImgModalVisible(true);
-    }else if(item.key == 'link'){
-      onAddLink(editorState, setEditorState);
-    }
-  }
-
-  const editor = React.useRef(null);
-  function focusEditor() {
-    editor.current.focus();
-    checkTypesStatus();
-  }
-
-  function preventLoseFocus(event){
-    event.preventDefault();
-    return false;
-  }
-
-  function keyBindingFn(event){
-    const code = event.code;
-    console.log(event);
-    if(code === 'Enter' || code === 'Backspace' || code.indexOf('Arrow') !== -1){
-      checkTypesStatus();
-    }else if(code === 'Tab'){
-    //   console.log("asdasd");
-    //   const newEditorState = RichUtils.onTab(event, editorState, 2);
-    //   if (newEditorState !== editorState) {
-    //     setEditorState(newEditorState);
-    //     return;
-    //  }
-    }
-    return getDefaultKeyBinding(event);
-  }
-
-  function checkTypesStatus(){
-    const blockType = RichUtils.getCurrentBlockType(editorState);
-    setBlockTypes(BlockTypes.map(item => ({...item, active: blockType == item.key})));
-    const inlineKeys = [...editorState.getCurrentInlineStyle()];
-    setInlineTypes(inlineTypes.map(item => ({...item, active: inlineKeys.includes(item.key)})));
-  }
-
-  function myBlockStyleFn(contentBlock) {
-    const type = contentBlock.getType();
-    if(type === 'unstyled'){
-      return 'Editable-unstyled';
-    }
-  }
-
-  function myBlockRenderer(contentBlock){
-    const type = contentBlock.getType();
-    if(type === 'atomic'){
-      return {
-        component: MediaComponent,
-        editable: false
-      };
-    }
-  }
-
-  function handleKeyCommand(command: string): string{
-    if(command == 'split-block' && RichUtils.getCurrentBlockType(editorState) == 'code-block'){
-      const newEditorState = RichUtils.insertSoftNewline(editorState);
-      setEditorState(newEditorState);
-      return 'handled'
-    }
-  }
-
-  // save article
+  // 保存文章
   const save = () => {
-    const content = convertToRaw(editorState.getCurrentContent());
-    
-    // delete content.entityMap['0'];
-    console.log(content);
-    content.blocks.map(item => {
-      item.text ? item.text = item.text.replace(/\n/g, '\\n') : '';
-    })
+    const content = richRditor.current.getContent();
     const data = {
       name: name,
       title: title,
@@ -144,9 +51,9 @@ const Edit = ({article}: {article: Article}) => {
         alert('保存失败！');
       }
     })
-    
   }
 
+  // 保存图片
   const saveImg = () => {
     const file = (document.getElementById('file-input') as any).files[0];
     if(file){
@@ -155,11 +62,16 @@ const Edit = ({article}: {article: Article}) => {
       fetch('http://localhost:3000/api/articles/img', {method: 'POST', body: form}).then(r => r.json()).then(r => {
         if(r.data){
           setUploadImgModalVisible(false);
-          console.log(r.data);
-          onAddImg(editorState, setEditorState, r.data);
+          richRditor.current.addImg(r.data);
         }
       })
     }
+  }
+
+  // 添加链接
+  const addLink = () => {
+    richRditor.current.addLink(linkUrl, linkText);
+    setAddLinkModalVisible(false);
   }
 
   return (
@@ -172,30 +84,19 @@ const Edit = ({article}: {article: Article}) => {
             id='file-input'></input>
         </Modal>
       )}
+      {addLinkModalVisible && ( 
+        <Modal setVisibleState={setAddLinkModalVisible} onSave={addLink}>
+          <input type='text' placeholder='链接地址' value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)}></input>
+          <br></br>
+          <input type='text' placeholder='显示文字' value={linkText} onChange={(e) => setLinkText(e.target.value)}></input>
+        </Modal>
+      )}
       <aside>
         <Link href='/articles'>
           <a className='tag-link'>All Articles</a>
         </Link>
-
-        <ul>
-          {inlineTypes.map(item => 
-            <li onClick={() => toggleInlineStyle(item)} onMouseDown={preventLoseFocus} key={item.key} className={item.active ? 'active' : ''}>
-              <i className={"iconfont " + item.icon}></i>
-            </li>
-          )}
-          {otherTypes.map(item => 
-            <li onClick={() => triggerOtherType(item)} onMouseDown={preventLoseFocus} key={item.key}>
-              <i className={"iconfont " + item.icon}></i>
-            </li>
-          )}
-          {blockTypes.map(item => 
-            <li onClick={() => toggleBlockType(item)} onMouseDown={preventLoseFocus} key={item.key} className={item.active ? 'active' : ''}>
-              <i className={"iconfont " + item.icon}></i>
-            </li>
-          )}
-        </ul>
       </aside>
-      <article className='article-content'>
+      <article>
         <div className='editor-wrapper'>
           <textarea 
             className='title-editor' 
@@ -204,20 +105,13 @@ const Edit = ({article}: {article: Article}) => {
             value={title} 
             onChange={(e) => setTitle(e.target.value)}>
           </textarea>
-          <div onClick={focusEditor}>
-            <NoSsr>
-              <Editor
-                ref={editor}
-                editorState={editorState}
-                onChange={setEditorState}
-                keyBindingFn={keyBindingFn}
-                handleKeyCommand={handleKeyCommand}
-                blockStyleFn={myBlockStyleFn}
-                blockRendererFn={myBlockRenderer}
-                placeholder="请输入正文"
-              />
-            </NoSsr>
-          </div>
+          <NoSsr>
+            <RichEditor 
+              contentState={contentState} 
+              ref={richRditor}
+              onAddImg={() => setUploadImgModalVisible(true)}
+              onAddLink={() => setAddLinkModalVisible(true)}></RichEditor>
+          </NoSsr>
           <div className='bottom'>
             文章名称：
             <input placeholder='请在此输入名称' value={name} onChange={(e) => setName(e.target.value)} className='input'/>

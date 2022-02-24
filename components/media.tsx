@@ -2,15 +2,20 @@ import Image from 'next/image';
 import {  EditorState, AtomicBlockUtils } from "draft-js";
 
 const MediaComponent = ({contentState, block}) => {
-  const entity = contentState.getEntity(block.getEntityAt(0));
-  const { src } = entity.getData();    // 取出图片的地址
-  const type = entity.getType();  // 判断 entity 的 type 的
-  const { width, height } = getQueryVariable(src);
-  return (
-    <>
-      <Image src={src} width={width} height={height}></Image>
-    </>
-  )
+  try{
+    const entity = contentState.getEntity(block.getEntityAt(0));
+    const { src } = entity.getData();    // 取出图片的地址
+    const { width, height } = getQueryVariable(src);
+    return (
+      <>
+        <Image src={src} width={width} height={height}></Image>
+      </>
+    )
+  }catch(e){
+    return <></>
+  }
+
+
 }
 
 function getQueryVariable(url){

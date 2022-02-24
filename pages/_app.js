@@ -1,6 +1,7 @@
 import '../styles/globals.scss';
 import '../styles/article.scss';
 import '../styles/highlight.css';
+import '../styles/rich-editor.scss';
 import Layout from '../components/layout';
 
 function MyApp({ Component, pageProps }) {

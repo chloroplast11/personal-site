@@ -21,6 +21,9 @@
       display: block;
       font-size: 14px;
     }
+    figure{
+      text-align: center;
+    }
     ul{
       margin-block-start: 1em;
       margin-block-end: 1em;
@@ -28,8 +31,8 @@
       margin-inline-end: 0px;
       padding-inline-start: 40px;
     }
-    ul li{ list-style: auto; }
-    ol li{ list-style: disc; }
+    ul li{ list-style: initial; }
+    ol li{ list-style: auto; }
   }
 
   aside{
@@ -63,7 +66,6 @@
   padding: 0 20px;
   background-color: #f6f6f6;
   min-height: 20em;
-  overflow: hidden;
   color: #121212;
   textarea, input{
     width: 100%;
@@ -95,23 +97,4 @@
     line-height: 1.4;
     font-weight: 600;
   }
-}
-
-//编辑器内部样式
-.public-DraftStyleDefault-pre{
-  padding: 1em;
-  background-color: #fdf6e3;
-  border-radius: 0.3em;
-  overflow: auto;
-  .cyhCodeBlock{
-    margin: 0;
-  }
-}
-
-figure{
-  text-align: center;
-}
-
-.Editable-styled, .Editable-unstyled {
-  margin: 0 0 1.4em;
 }

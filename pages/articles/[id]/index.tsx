@@ -40,6 +40,7 @@ export default function ArticleDetails({article}: {article: Article}) {
   
   if(article.content){
     const contentState = convertFromRaw(JSON.parse(article.content));
+    console.log(contentState.toJS());
     html = stateToHTML(contentState, options);
   }
 

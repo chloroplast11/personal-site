@@ -1,0 +1,65 @@
+//编辑器内部样式
+.draft-rich-editor{
+  position: relative;
+
+  ul.editor-btns{
+    position: absolute;
+    left: -80px;
+    top: -10px;
+    display: flex;
+    flex-direction: column;
+    max-height: 450px;
+    flex-wrap: wrap-reverse;
+    margin-top: 0;
+    li{
+      height: 40px;
+      width: 40px;
+      line-height: 38px;
+      border: 1px solid #e6e6e6;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 10px 6px;
+      cursor: pointer;
+      text-align: center;
+      list-style: none;
+      &:hover{
+        color: #5d93ff;
+      }
+      &.active{
+        color: #5d93ff;
+      }
+    }
+  }
+
+  pre>code{
+    padding: 1em;
+    background-color: #fdf6e3;
+    border-radius: 0.3em;
+    overflow: auto;
+    display: block;
+    font-size: 14px;
+  }
+
+  .public-DraftStyleDefault-pre{
+    padding: 1em;
+    background-color: #fdf6e3;
+    border-radius: 0.3em;
+    overflow: auto;
+    .cyhCodeBlock{
+      margin: 0;
+    }
+  }
+  
+  .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-listLTR:before{
+    display: none;
+  }
+  
+  figure{
+    text-align: center;
+  }
+  
+  .Editable-styled, .Editable-unstyled {
+    margin: 0 0 1.4em;
+  }
+}
+
