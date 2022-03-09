@@ -11,6 +11,11 @@
     max-height: 450px;
     flex-wrap: wrap-reverse;
     margin-top: 0;
+    &.fix{
+      position: fixed;
+      top: 10px;
+      left: 300px;
+    }
     li{
       height: 40px;
       width: 40px;

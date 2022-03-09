@@ -153,8 +153,8 @@ const Edit = ({article}: {article: Article}) => {
         </Modal>
       )}
       <aside>
-        <Link href='/articles'>
-          <a className='tag-link'>所有文章</a>
+        <Link href='.'>
+          <a className='tag-link'>返回</a>
         </Link>
       </aside>
       <article>
@@ -195,9 +195,11 @@ const Edit = ({article}: {article: Article}) => {
         <div className='form-row'>
           <label>添加标签：</label>
           <select onChange={($event) => setTagId($event.target.value)}>
-            {allTags.map(item => 
-              <option key={item.id} value={item.id}>{item.name}</option>
-            )}
+            {
+              allTags ? allTags.map(item => 
+                <option key={item.id} value={item.id}>{item.name}</option>
+              ) : ''
+            }
           </select>
           <button onClick={addTag}>添加</button>
         </div>
@@ -207,10 +209,12 @@ const Edit = ({article}: {article: Article}) => {
           <button onClick={createTag}>创建</button>
         </div>
         <div className='tag-list'>
-          {tagList.map(item => 
-            <div className='article-tag' key={item.id}>
-              {item.name} <i className='iconfont icon-ICONbiaozhun_fuzhi-' onClick={() => deleteTag(item.id)}></i>
-            </div>)
+          {
+            tagList ? tagList.map(item => 
+              <div className='article-tag' key={item.id}>
+                {item.name} <i className='iconfont icon-ICONbiaozhun_fuzhi-' onClick={() => deleteTag(item.id)}></i>
+              </div>
+            ) : '' 
           }
         </div>
         

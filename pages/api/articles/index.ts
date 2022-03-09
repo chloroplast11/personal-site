@@ -2,9 +2,10 @@ import { NextApiHandler } from "next";
 const db = require('../db');
 
 const ArticlesHandler: NextApiHandler = (req, res) => {
-  const { method, body } = req;
+  const { method, body, query } = req;
   if(method == 'GET'){
-    get(res);
+    const { status } = query;
+    get(res, status);
   }else if(method == 'POST'){
     add(res, body);
   }else{
@@ -13,13 +14,14 @@ const ArticlesHandler: NextApiHandler = (req, res) => {
 }
 
 // query all articles
-function get(res){
+function get(res, status){
   db.query(`
-    select articles.*, GROUP_CONCAT(tags.name) as tags
+    select articles.*, GROUP_CONCAT(tags.name) as tags, publish_status as publishStatus
     from articles 
     LEFT JOIN articles_tags on articles_tags.article_id = articles.id
     LEFT JOIN tags on articles_tags.tag_id = tags.id
     group by articles.id
+    ${status ? '' : 'having publish_status = 2'}
   `,(err,result) => {
       if(err){
         res.status(500).json({ message: err });

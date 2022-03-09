@@ -10,6 +10,9 @@ const hljs = require('highlight.js');
 export default function ArticleDetails({article}: {article: Article}) {
 
   console.log(article);
+  if(article && article.tagList){
+    article.tags = article.tagList.map(item => item.name).toString();
+  }
 
   let html;
   const options = {
@@ -40,20 +43,20 @@ export default function ArticleDetails({article}: {article: Article}) {
   
   if(article.content){
     const contentState = convertFromRaw(JSON.parse(article.content));
-    console.log(contentState.toJS());
     html = stateToHTML(contentState, options);
   }
 
   return (
     <>
       <Head>
-        <title>{article.name}</title>
+        <title>{article.title}</title>
         <meta name='description' content={article.abstract}></meta>
+        <meta name='keywords' content={article.tags}></meta>
       </Head>
       <main id='article'>
         <aside>
           <Link href='/articles'>
-            <a className='tag-link'>All Articles</a>
+            <a className='tag-link'>所有文章</a>
           </Link>
         </aside>
         <article className='article-content'>

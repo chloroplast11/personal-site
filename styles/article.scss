@@ -4,65 +4,73 @@
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
-  .article-content{
-    >h1.title{
-      text-align: center;
-      font-size: 40px;
-      max-width: 80%;
-      margin: 0 auto;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-    pre>code{
-      padding: 1em;
-      background-color: #fdf6e3;
-      border-radius: 0.3em;
-      overflow: auto;
-      display: block;
-      font-size: 14px;
-    }
-    figure{
-      text-align: center;
-    }
-    ul{
-      margin-block-start: 1em;
-      margin-block-end: 1em;
-      margin-inline-start: 0px;
-      margin-inline-end: 0px;
-      padding-inline-start: 40px;
-    }
-    ul li{ list-style: initial; }
-    ol li{ list-style: auto; }
-  }
-
   aside{
     position: fixed;
     top: 30px;
     left: 30px;
     text-align: center;
-    ul{
-      margin-top: 30px;
-      li{
-        height: 40px;
-        width: 40px;
-        line-height: 38px;
-        border: 1px solid #e6e6e6;
-        border-radius: 50%;
-        overflow: hidden;
-        margin: 10px auto;
+  }
+  .form-row{
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    label{
+      margin-right: 8px;
+    }
+    button{
+      margin-left: 10px;
+    }
+  }
+  .tag-list{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    .article-tag{
+      margin: 8px 8px 8px 0;
+      padding: 4px;
+      text-align: center;
+      line-height: 16px;
+      border: 1px solid #121212;
+      i{
         cursor: pointer;
-        &:hover{
-          color: #5d93ff;
-        }
-        &.active{
-          color: #5d93ff;
-        }
       }
     }
   }
+
 }
 
-.editor-wrapper{
+#article .article-content{
+  >h1.title{
+    text-align: center;
+    font-size: 40px;
+    max-width: 80%;
+    margin: 0 auto;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  pre>code{
+    padding: 1em;
+    background-color: #fdf6e3;
+    border-radius: 0.3em;
+    overflow: auto;
+    display: block;
+    font-size: 14px;
+  }
+  figure{
+    text-align: center;
+  }
+  ul{
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+  }
+  ul li{ list-style: initial; }
+  ol li{ list-style: auto; }
+}
+
+#article .editor-wrapper{
   padding: 0 20px;
   background-color: #f6f6f6;
   min-height: 20em;

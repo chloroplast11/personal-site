@@ -1,5 +1,5 @@
 import { NextApiHandler } from "next";
-const db = require('../db');
+const db = require('../../db');
 
 const ArticleHandler: NextApiHandler = (req, res) => {
 
@@ -10,6 +10,8 @@ const ArticleHandler: NextApiHandler = (req, res) => {
     update(res, body, id);
   }else if(method == 'GET'){
     get(res, id);
+  }else if(method == 'PATCH'){
+    patchStatus(res, body, id);
   }else{
     res.status(500).json({ message: 'cannot reponse to this http method' })
   }
@@ -22,18 +24,24 @@ function get(res, id){
     res.status(400).json({ message: 'The paramater "id" is missed' }); return;
   }
   db.query(`
-    select articles.*, GROUP_CONCAT(tags.name) as tags
+    select *, publish_status as publishStatus
     from articles 
-    LEFT JOIN articles_tags on articles_tags.article_id = articles.id
-    LEFT JOIN tags on articles_tags.tag_id = tags.id
     where articles.name = '${id}'
-    group by articles.id
   `,(err,result) => {
     if(err){
       res.status(500).json({ message: err });
     }else{
       if(result[0]){
-        res.status(200).json(result[0]);
+        const { id } = result[0];
+        db.query(`
+          select name, id
+          from tags 
+          LEFT JOIN articles_tags on tags.id = articles_tags.tag_id
+          where articles_tags.article_id = '${id}'
+        `,(err,tagList) => {
+          result[0].tagList = tagList ? tagList : [];
+          res.status(200).json(result[0]);
+        })
       }else{
         res.status(400).json({ message: 'Invalid id' });
       }
@@ -53,6 +61,24 @@ function update(res, body, id){
         content = '${content}',
         title = '${title}',
         abstract = '${abstract}'
+    WHERE articles.id = '${id}'
+  `,(err,result) => {
+    if(err){
+      res.status(500).json({ message: err });
+    }else{
+      res.status(200).json({ message: 'success' });
+    }
+  });
+}
+
+function patchStatus(res, body, id){
+  let { publishStatus } = body;
+  if(!id){
+    res.status(400).json({ message: 'The paramater "publishStatus" is missed' }); return;
+  }
+  db.query(`
+    UPDATE articles 
+    SET publish_status = '${publishStatus}'
     WHERE articles.id = '${id}'
   `,(err,result) => {
     if(err){

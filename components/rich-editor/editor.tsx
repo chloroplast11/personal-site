@@ -1,14 +1,28 @@
-import React, { Ref, useImperativeHandle, useState } from "react";
-import { Editor, EditorState, RichUtils, Modifier, getDefaultKeyBinding, convertToRaw, AtomicBlockUtils } from "draft-js";
+import React, { Ref, useEffect, useImperativeHandle, useState } from "react";
+import { Editor, EditorState, RichUtils, Modifier, getDefaultKeyBinding, convertToRaw, AtomicBlockUtils, ContentState, DraftHandleValue, RawDraftContentState } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { BlockTypes, InlineTypes, otherTypes } from "../../model/editor";
 import MediaComponent from "../media";
 import { createLinkDecorator } from "../link";
 
-const RichEditor = ({contentState, onAddImg, onAddLink}, ref: Ref<any>) => {
+export interface RichEditorRef{
+  addImg: (src: string) => void,
+  addLink: (linkUrl: string, linkText: string) => void,
+  getContent: () => RawDraftContentState
+}
+
+export interface RichEditorProps{
+  contentState: ContentState, 
+  onAddImg: () => void, 
+  onAddLink: () => void
+}
+
+const RichEditor = ({contentState, onAddImg, onAddLink}: RichEditorProps, ref: Ref<RichEditorRef>) => {
 
   const [inlineTypes, setInlineTypes] = useState(InlineTypes.map(item => ({...item, active: false})));
   const [blockTypes, setBlockTypes] = useState(BlockTypes.map(item => ({...item, active: false})));
+
+  const [isComposition, setIsComposition] = useState(false);
   
   const decorator = createLinkDecorator();
   const [editorState, setEditorState] = useState(() => 
@@ -43,30 +57,13 @@ const RichEditor = ({contentState, onAddImg, onAddLink}, ref: Ref<any>) => {
   const checkTypesStatus = () => {
     const blockType = RichUtils.getCurrentBlockType(editorState);
     setBlockTypes(BlockTypes.map(item => ({...item, active: blockType == item.key})));
-    const inlineKeys = [...editorState.getCurrentInlineStyle()];
+    const inlineKeys = editorState.getCurrentInlineStyle().toJS();
     setInlineTypes(inlineTypes.map(item => ({...item, active: inlineKeys.includes(item.key)})));
   }
 
   const focusEditor = () => {
     editorRef.current.focus();
     checkTypesStatus();
-  }
-
-  const myBlockStyleFn = (contentBlock) => {
-    const type = contentBlock.getType();
-    if(type === 'unstyled'){
-      return 'Editable-unstyled';
-    }
-  }
-
-  const myBlockRenderer = (contentBlock) => {
-    const type = contentBlock.getType();
-    if(type === 'atomic'){
-      return {
-        component: MediaComponent,
-        editable: false
-      };
-    }
   }
 
   const keyBindingFn = (event) => {
@@ -86,7 +83,7 @@ const RichEditor = ({contentState, onAddImg, onAddLink}, ref: Ref<any>) => {
     return getDefaultKeyBinding(event);
   }
 
-  const handleKeyCommand = (command: string): string => {
+  const handleKeyCommand = (command: string, editorState: EditorState): DraftHandleValue => {
     if(command == 'split-block' && RichUtils.getCurrentBlockType(editorState) == 'code-block'){
       const newEditorState = RichUtils.insertSoftNewline(editorState);
       setEditorState(newEditorState);
@@ -109,13 +106,11 @@ const RichEditor = ({contentState, onAddImg, onAddLink}, ref: Ref<any>) => {
   // 获取内容
   const getContent = () => {
     const content = convertToRaw(editorState.getCurrentContent());
-    // delete content.entityMap['0'];
     content.blocks.map(item => {
       if(item.text){
         item.text = item.text.replace(/\n/g, '\\n');
       }
     })
-    console.log(content);
     return content;
   }
 
@@ -180,34 +175,46 @@ const RichEditor = ({contentState, onAddImg, onAddLink}, ref: Ref<any>) => {
 
   const [btnsStyle, setBtnsStyle] = useState(null);
 
-  document.addEventListener('scroll', (e) => {
-    if(btnsRef && btnsRef.current){
-      const el = btnsRef.current;
+  let btnsInitialTop: number;
+
+  const onScroll = (e) => {
+    if(!btnsRef || !btnsRef.current){ return }
+
+    const el = btnsRef.current;
+    if(!btnsInitialTop){ 
+      btnsInitialTop = getTop(el);
+    }
+
+    if(!btnsStyle){ // 还没固定
       const { top, left } = el.getBoundingClientRect();
-      if(top < 1){
+      if(top < 0){
         setBtnsStyle({
           position: 'fixed',
-          top: '10px',
-          left: left + 'px'
+          left: left + 'px',
+          top: '10px'
         });
-        // el.style.position = 'fixed';
-        // el.style.top = '10px';
-        // el.style.left = left + 'px';
-      }else{
+      }
+    }else{ // 已经固定
+      if(document.documentElement.scrollTop < btnsInitialTop){
         setBtnsStyle(null);
       }
-      // else{
-      //   el.style.position = 'absolute';
-      //   el.style.top = null;
-      //   el.style.left = null;
-      // }
     }
-  })
+  }
+
+  useEffect(() => {
+    document.addEventListener('scroll', onScroll);
+  }, [])
+
+  const onEditorStateChange = (e) => {
+    if(!isComposition){
+      setEditorState(e);
+    }
+  }
 
   return (
     <>
-      <div className='draft-rich-editor' onClick={focusEditor}>
-        <ul className="editor-btns" ref={btnsRef} style={btnsStyle}>
+      <div className='draft-rich-editor' onClick={focusEditor} onCompositionStart={() => setIsComposition(true)} onCompositionEnd={() => setIsComposition(false)}>
+        <ul className={"editor-btns"} ref={btnsRef} style={btnsStyle}>
           {inlineTypes.map(item => 
             <li onClick={() => toggleInlineStyle(item)} 
                 key={item.key} 
@@ -238,7 +245,7 @@ const RichEditor = ({contentState, onAddImg, onAddLink}, ref: Ref<any>) => {
         <Editor
           ref={editorRef}
           editorState={editorState}
-          onChange={setEditorState}
+          onChange={onEditorStateChange}
           keyBindingFn={keyBindingFn}
           handleKeyCommand={handleKeyCommand}
           blockStyleFn={myBlockStyleFn}
@@ -252,3 +259,30 @@ const RichEditor = ({contentState, onAddImg, onAddLink}, ref: Ref<any>) => {
 }
 
 export default React.forwardRef(RichEditor);
+
+// 获取元素离文档顶部位置
+function getTop(e){
+  let offset=e.offsetTop;
+  if(e.offsetParent!=null) offset+=getTop(e.offsetParent);
+  return offset;
+}
+
+// 渲染自定义block逻辑
+const myBlockRenderer = (contentBlock) => {
+  const type = contentBlock.getType();
+  if(type === 'atomic'){
+    return {
+      component: MediaComponent,
+      editable: false
+    };
+  }
+}
+
+// block样式处理方法
+const myBlockStyleFn = (contentBlock) => {
+  const type = contentBlock.getType();
+  if(type === 'unstyled'){
+    return 'Editable-unstyled';
+  }
+}
+

@@ -4,6 +4,7 @@ import {  EditorState, AtomicBlockUtils } from "draft-js";
 const MediaComponent = ({contentState, block}) => {
   try{
     const entity = contentState.getEntity(block.getEntityAt(0));
+    console.log(entity);
     const { src } = entity.getData();    // 取出图片的地址
     const { width, height } = getQueryVariable(src);
     return (

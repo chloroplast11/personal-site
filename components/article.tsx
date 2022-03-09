@@ -18,7 +18,7 @@ const monthObj = {
   11: '十二月'
 }
 
-const ArticleComponent = ({item}:{item:Article}) => {
+const ArticleComponent = ({item, noRead}:{item:Article, noRead: boolean}) => {
   let dateObj = new Date(item.date);
   const dateStr = monthObj[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
   const date = dateObj.getFullYear + '-' + (dateObj.getMonth() + 1) + '-' + (dateObj.getDate() + 1);
@@ -43,9 +43,12 @@ const ArticleComponent = ({item}:{item:Article}) => {
       <p className={styles.description}>
         {item.abstract}
       </p>
-      <Link href={`/articles/${item.name}`}>
-        <a className={styles.readMore}>阅读</a> 
-      </Link>
+      {noRead ? '' : (
+        <Link href={`/articles/${item.name}`}>
+          <a className={styles.readMore}>阅读</a> 
+        </Link>
+      )}
+      
     </div>
   )
 }
